@@ -1,5 +1,9 @@
 <?php
-  include('includes/nav.php');
+ if ($_GET['num']==''){
+   header("Location:index.php");
+ }else{
+   include('includes/nav.php');
+ }
 ?>
 
     <!-- Comienza Contenido del Post -->
@@ -22,14 +26,11 @@
     <div class="container">
      <div class="row">
       <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        <section>
-          <label>Usuario</label>
-          <label class='etiqueta'>dd/mm/yyyy</label>
-          <p>Este es un comentario</p>
+        <section id='sec-coments'>
+          <label></label>
+          <label class='etiqueta'></label>
+          <p></p>
           <hr>
-          <label>Usuario 2</label>
-          <label class='etiqueta'>dd/mm/yyyy</label>
-          <p>Este es otro comentario</p>
         </section><br>
       <h4>
        ¡Deja un comentario, son gratis!
@@ -56,7 +57,7 @@
           <br>
           <div class="row">
               <div class="form-group col-xs-12">
-                  <button type="submit" id="publicar" class="btn btn-default">Enviar</button>
+                  <button type="button" id="publicar" class="btn btn-default">Enviar</button>
               </div>
           </div>
       </form>
@@ -70,7 +71,34 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
+  function validateEmail(email) {
+    var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    return emailReg.test(email);
+ }
+
   id=$("#id").val();
+  $.ajax({
+    async:true,
+    url:"php/servicios.php",
+    data:{id:id,servicio:'comentarios'},
+    cache:false,
+    type: "POST",
+    dataType:'json',
+    success:function(resultado){
+      $("#sec-coments").empty();
+      if (resultado.comentarios!='cero'){
+        $.each(resultado.comentarios,function(index,item){
+            $('#sec-coments').append(
+              '<label>'+item.nombre+'</label>'+
+              '<label class="etiqueta">'+item.fecha+'</label>'+
+              '<p>'+item.comentario+'</p>'+
+              '<hr>'
+            );
+        });
+      }
+    }
+  });
+
   $.ajax({
     async:true,
     url:"php/servicios.php",
@@ -90,6 +118,38 @@ $(document).ready(function(){
     }
   });
 
+ $("#publicar").click(function(){
+   nombre=$("#nombre").val();
+   email=$('#email').val();
+   comentario=$('#comentario').val();
 
+   if (nombre!='' && validateEmail(email) && comentario!=''){
+     $.ajax({
+       async:true,
+       url:"php/servicios.php",
+       data:{id:id,
+             nombre:nombre,
+             email:email,
+             comentario:comentario,
+             servicio:'nuevo-comentario'},
+       cache:false,
+       type: "POST",
+       dataType:'json',
+       success:function(resultado){
+         if (resultado.status=='registrado'){
+           $("#sec-coments").append(
+             '<label>'+nombre+'</label>'+
+             '<label class="etiqueta">'+resultado.fecha+'</label>'+
+             '<p>'+comentario+'</p>'+
+             '<hr>'
+           );
+           $(".form-control").val("").attr('placeholder','');
+         }
+       }
+     });
+   }else{
+     bootbox.alert("¡Ups, ingresa tus datos correctamente para enviar tu comentario!");
+   }
+ });
 });
 </script>

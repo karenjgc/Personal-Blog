@@ -65,6 +65,7 @@ session_start();
     }
 
     .etiqueta{
+      padding-left: 3px;
       font-size: 0.6em;
       color:#777777;
     }
@@ -127,7 +128,6 @@ session_start();
                     <span class="sr-only">Toggle navigation</span>
                     Menu <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="index.html">Start Bootstrap</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
