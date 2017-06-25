@@ -121,19 +121,25 @@
    case 'nuevo-comentario':
     $dt = new DateTime();
     $fecha= $dt->format('Y-m-d');
+    $secret="6LepvyYUAAAAAH8NinTM19Tf8KcCUNZRJbVmOEHv";
+    $captcha = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$secret."&response=" . $_POST['response'] . "&remoteip=" . $_SERVER['REMOTE_ADDR']));
 
-    try {
-     $query=$conexion->prepare("INSERT into comentarios(nombre,email,comentario,fecha,id_entrada)
-                             values(:nombre,:email,:comentario,:fecha,:id_entrada)");
-     $query->bindParam(':nombre',trim($_POST['nombre']));
-     $query->bindParam(':email',trim($_POST['email']));
-     $query->bindParam(':comentario',trim($_POST['comentario']));
-     $query->bindParam(':fecha',$fecha);
-     $query->bindParam(':id_entrada',$_POST['id']);
-     $query->execute();
-     echo json_encode(array('status'=>'registrado','fecha'=>$fecha));
-    } catch (Exception $e) {
-     echo json_encode(array('status'=>$e->getMessage()));
+    if($captcha->success == false){
+      echo json_encode(array('status' => 'error'));
+    }else{
+      try {
+       $query=$conexion->prepare("INSERT into comentarios(nombre,email,comentario,fecha,id_entrada)
+                               values(:nombre,:email,:comentario,:fecha,:id_entrada)");
+       $query->bindParam(':nombre',trim($_POST['nombre']));
+       $query->bindParam(':email',trim($_POST['email']));
+       $query->bindParam(':comentario',trim($_POST['comentario']));
+       $query->bindParam(':fecha',$fecha);
+       $query->bindParam(':id_entrada',$_POST['id']);
+       $query->execute();
+       echo json_encode(array('status'=>'registrado','fecha'=>$fecha));
+      } catch (Exception $e) {
+       echo json_encode(array('status'=>$e->getMessage()));
+      }
     }
      break;
  }

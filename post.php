@@ -54,7 +54,9 @@
                   <textarea id='comentario' rows="3" class="form-control" placeholder="Comentario" required></textarea>
               </div>
           </div>
-          <br>
+          <div class="row control-group">
+              <div class="g-recaptcha" style='padding:1em;' data-sitekey="6LepvyYUAAAAAHgCdfNOjRvePjRTTSWIKXPVUxAf"></div>
+          </div>
           <div class="row">
               <div class="form-group col-xs-12">
                   <button type="button" id="publicar" class="btn btn-default">Enviar</button>
@@ -131,6 +133,7 @@ $(document).ready(function(){
              nombre:nombre,
              email:email,
              comentario:comentario,
+             response:grecaptcha.getResponse(),
              servicio:'nuevo-comentario'},
        cache:false,
        type: "POST",
@@ -144,6 +147,8 @@ $(document).ready(function(){
              '<hr>'
            );
            $(".form-control").val("").attr('placeholder','');
+         }else{
+           bootbox.alert("Por favor, comprueba que no eres un robot.");
          }
        }
      });
